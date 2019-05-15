@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import de.peass.DependencyReadingStarter;
+import de.peass.dependency.PeASSFolders;
 import de.peass.utils.OptionConstants;
 import de.peass.vcs.GitCommit;
 import de.peass.vcs.GitUtils;
@@ -40,10 +41,10 @@ public abstract class Evaluator {
 		OBJECTMAPPER.enable(SerializationFeature.INDENT_OUTPUT);
 	}
 
-	protected final File projectFolder;
+	protected final EvaluationFolders folders;
 	protected final VersionIterator iterator;
-	protected final File debugFolder;
-	protected final File resultFolder;
+//	protected final File debugFolder;
+//	protected final File resultFolder;
 	protected final EvaluationProject evaluation;
 	protected final SysoutTestExecutor executor;
 
@@ -61,7 +62,7 @@ public abstract class Evaluator {
 		}
 
 		LOG.debug("Lese {}", projectFolder.getAbsolutePath());
-		this.projectFolder = projectFolder;
+		this.folders = new EvaluationFolders(projectFolder);
 
 		final String url = GitUtils.getURL(projectFolder);
 		final List<GitCommit> commits = DependencyReadingStarter.getGitCommits(line, projectFolder);
@@ -72,16 +73,16 @@ public abstract class Evaluator {
 		//TODO Ersten Lauffähigen suchen
 //		executor.searchFirstRunningCommit(iterator, executor, projectFolder);
 
-		debugFolder = new File(projectFolder, "debug_" + type);
-		if (!debugFolder.exists()) {
-			debugFolder.mkdir();
-		}
-		System.out.println("Commit: " + iterator.getTag());
-
-		resultFolder = new File("evaluation_results");
-		if (!resultFolder.exists()) {
-			resultFolder.mkdir();
-		}
+//		debugFolder = new File(projectFolder, "debug_" + type);
+//		if (!debugFolder.exists()) {
+//			debugFolder.mkdir();
+//		}
+//		System.out.println("Commit: " + iterator.getTag());
+//
+//		resultFolder = new File("evaluation_results");
+//		if (!resultFolder.exists()) {
+//			resultFolder.mkdir();
+//		}
 
 		evaluation = new EvaluationProject();
 		evaluation.setUrl(url);
@@ -113,12 +114,12 @@ public abstract class Evaluator {
 				}
 
 				if (inTests) {
-					LOG.debug("Line: {}", line);
+					LOG.trace("Line: {}", line);
 					final String runningString = "Running ";
 					if (line.startsWith(runningString)) {
 						final String testname = line.substring(runningString.length());
 						final String testsRun = reader.readLine();
-						LOG.debug("Line: {}", testsRun);
+						LOG.trace("Line: {}", testsRun);
 						final String testsRunString = "Tests run: ";
 						if (testsRun != null && testsRun.startsWith(testsRunString)) {
 							final String[] splitted = testsRun.split(",");

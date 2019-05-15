@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,9 +43,9 @@ public class GetNonSelectedTests {
 			final TestSet allTestSet = allVersion.getValue();
 			if (selected.getVersions().containsKey(allVersion.getKey())) {
 				final TestSet selectedVersion = selected.getVersions().get(allVersion.getKey());
-				for (final Map.Entry<ChangedEntity, List<String>> selectedTests : selectedVersion.getTestcases().entrySet()) {
+				for (final Entry<ChangedEntity, Set<String>> selectedTests : selectedVersion.getTestcases().entrySet()) {
 					final String testclazz = selectedTests.getKey().getJavaClazzName();
-					final List<String> remainingTests = allTestSet.getTestcases().get(testclazz);
+					final Set<String> remainingTests = allTestSet.getTestcases().get(selectedTests.getKey());
 					System.out.println("Searching: " + testclazz + " " + remainingTests);
 					if (remainingTests != null) { //TODO Workaround: Test-suite and extended tests are also selected, but shouldn't
 						if (!remainingTests.containsAll(selectedTests.getValue())) {
@@ -53,7 +55,7 @@ public class GetNonSelectedTests {
 
 						remainingTests.removeAll(selectedTests.getValue());
 						if (remainingTests.size() == 0) {
-							allTestSet.getTestcases().remove(testclazz);
+							allTestSet.getTestcases().remove(selectedTests.getKey());
 						}
 					}
 				}

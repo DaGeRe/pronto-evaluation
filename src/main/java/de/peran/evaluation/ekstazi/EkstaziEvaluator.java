@@ -25,23 +25,26 @@ public class EkstaziEvaluator extends Evaluator {
 
 	@Override
 	public void evaluate() {
-		final File resultFile = new File(resultFolder, "evaluation_" + projectFolder.getName() + "_ekstazi.json");
+		final File resultFile = folders.getResultFolder("ekstazi");
 		int i = 0;
 		while (iterator.hasNextCommit()) {
 			iterator.goToNextCommit();
+			
+			final File pomFile = new File(folders.getProjectFolder(), "pom.xml");
+			if (pomFile.exists()) {
+			   final File currentFile = folders.getResultFile(i, iterator.getTag());
+	         executor.preparePom();
+	         executor.executeAllKoPeMeTests(currentFile);
 
-			final File currentFile = new File(debugFolder, "myResult" + i + "_" + iterator.getTag() + ".txt");
-			executor.preparePom();
-			executor.executeAllKoPeMeTests(currentFile);
-
-			final EvaluationVersion currentVersion = getTestsFromFile(currentFile);
-			if (currentVersion.getTestcaseExecutions().size() > 0) {
-				evaluation.getVersions().put(iterator.getTag(), currentVersion);
-				try {
-					OBJECTMAPPER.writeValue(resultFile, evaluation);
-				} catch (final IOException e) {
-					e.printStackTrace();
-				}
+	         final EvaluationVersion currentVersion = getTestsFromFile(currentFile);
+	         if (currentVersion.getTestcaseExecutions().size() > 0) {
+	            evaluation.getVersions().put(iterator.getTag(), currentVersion);
+	            try {
+	               OBJECTMAPPER.writeValue(resultFile, evaluation);
+	            } catch (final IOException e) {
+	               e.printStackTrace();
+	            }
+	         }
 			}
 
 			i++;

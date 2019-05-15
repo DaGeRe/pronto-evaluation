@@ -119,7 +119,7 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 			final Plugin ekstazi = new Plugin();
 			ekstazi.setGroupId("org.ekstazi");
 			ekstazi.setArtifactId("ekstazi-maven-plugin");
-			ekstazi.setVersion("4.6.3");
+			ekstazi.setVersion("5.2.0");
 			final PluginExecution ekstaziExecution = new PluginExecution();
 			ekstaziExecution.setGoals(Arrays.asList(new String[] { "select" }));
 			final List<PluginExecution> ekstaziExecutions = new LinkedList<>();

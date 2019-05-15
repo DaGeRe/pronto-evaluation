@@ -24,6 +24,7 @@ import de.peass.DependencyReadingStarter;
 import de.peass.dependency.ClazzFinder;
 import de.peass.dependency.analysis.data.ChangedEntity;
 import de.peass.dependency.analysis.data.TestCase;
+import de.peass.dependency.changesreading.FileComparisonUtil;
 import de.peass.dependency.persistence.ExecutionData;
 import de.peass.testtransformation.JUnitTestTransformer;
 import de.peass.testtransformation.ParseUtil;
@@ -51,8 +52,8 @@ public class ReadAllTests extends Evaluator {
    public ReadAllTests(final String args[]) throws ParseException {
       super("readall", args);
       final File resultFolder = DependencyReadingStarter.getResultFolder();
-      final String projectName = projectFolder.getName();
-      final String url = GitUtils.getURL(projectFolder);
+      final String projectName = folders.getProjectFolder().getName();
+      final String url = GitUtils.getURL(folders.getProjectFolder());
       changedTraceMethods.setUrl(url);
       executeFile = new File(resultFolder, "execute_full_" + projectName + ".json");
    }
@@ -77,7 +78,7 @@ public class ReadAllTests extends Evaluator {
    private void analyzeVersion() {
       final String version = iterator.getTag();
 
-      final File srcFolder = new File(projectFolder, "src");
+      final File srcFolder = new File(folders.getProjectFolder(), "src");
       final List<String> clazzes = ClazzFinder.getTestClazzes(srcFolder);
       final File testSrcFolder = ClazzFinder.getTestFolder(srcFolder);
       for (final String clazzName : clazzes) {
@@ -86,11 +87,11 @@ public class ReadAllTests extends Evaluator {
          if (clazzFile.exists()) {
             try {
                LOG.trace("Clazz: {}", clazzName);
-               final CompilationUnit unit = JavaParser.parse(clazzFile);
+               final CompilationUnit unit = FileComparisonUtil.parse(clazzFile);
                final ClassOrInterfaceDeclaration clazz = ParseUtil.getClass(unit);
-               final JUnitTestTransformer transformer = new JUnitTestTransformer(projectFolder);
+               final JUnitTestTransformer transformer = new JUnitTestTransformer(folders.getProjectFolder());
                if (clazz != null) { // File could also define @interface instead of class
-                  final List<String> methods = transformer.getTests(projectFolder, new ChangedEntity(clazz.getNameAsString(), ""));
+                  final List<String> methods = transformer.getTests(folders.getProjectFolder(), new ChangedEntity(clazz.getNameAsString(), ""));
                   for (final String method : methods) {
                      final TestCase testcase = new TestCase(clazzName, method);
                      changedTraceMethods.addCall(version, version + "~1", testcase);

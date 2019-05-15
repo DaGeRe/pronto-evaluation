@@ -27,12 +27,12 @@ public class EmptyEvaluation extends Evaluator {
 
 	@Override
 	public void evaluate() {
-		final File resultFile = new File(resultFolder, "evaluation_" + projectFolder.getName() + "_empty.json");
+		final File resultFile = folders.getResultFolder("empty");
 		int i = 0;
 		while (iterator.hasNextCommit()) {
 			iterator.goToNextCommit();
 
-			final File currentFile = new File(debugFolder, "myResult" + i + "_" + iterator.getTag() + ".txt");
+			final File currentFile = folders.getResultFile(i, iterator.getTag());
 			executor.executeAllKoPeMeTests(currentFile);
 
 			final EvaluationVersion currentVersion = getTestsFromFile(currentFile);

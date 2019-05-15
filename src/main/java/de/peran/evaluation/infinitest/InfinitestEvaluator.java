@@ -41,11 +41,11 @@ public class InfinitestEvaluator extends Evaluator {
 
 	@Override
 	public void evaluate() {
-		final List<File> classPath = Arrays.asList(new File(projectFolder, "target/classes"), new File(projectFolder, "target/test-classes"));
-		final File pomFile = new File(projectFolder, "pom.xml");
+		final List<File> classPath = Arrays.asList(new File(folders.getProjectFolder(), "target/classes"), new File(folders.getProjectFolder(), "target/test-classes"));
+		final File pomFile = new File(folders.getProjectFolder(), "pom.xml");
 		final StandaloneClasspath classpath = new StandaloneClasspath(classPath, classPath);
 		final FileChangeDetector changeDetector = new FileChangeDetector();
-		final File resultFile = new File(resultFolder, "evaluation_" + projectFolder.getName() + "_infinitest.json");
+		final File resultFile = folders.getResultFolder("infinitest");
 
 		changeDetector.setClasspathProvider(classpath);
 
@@ -68,7 +68,7 @@ public class InfinitestEvaluator extends Evaluator {
 					writer.write(new FileWriter(pomFile), model);
 
 					final ProcessBuilder pb = new ProcessBuilder(new String[] { "mvn", "compile", "test-compile" });
-					pb.directory(projectFolder);
+					pb.directory(folders.getProjectFolder());
 
 					pb.start().waitFor();
 
@@ -90,7 +90,7 @@ public class InfinitestEvaluator extends Evaluator {
 
 					if (currentVersion.getTestcaseExecutions().size() > 0) {
 						testname = testname.substring(0, testname.length() - 1);
-						final File currentFile = new File(debugFolder, "myResult" + i + "_" + iterator.getTag() + ".txt");
+						final File currentFile =  folders.getResultFile(i, iterator.getTag());
 
 						executor.executeTests(currentFile, testname);
 

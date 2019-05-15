@@ -3,6 +3,7 @@ package de.peran.evaluation.base;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import de.peass.dependency.analysis.data.ChangedEntity;
 import de.peass.dependency.analysis.data.TestSet;
@@ -25,7 +26,7 @@ public final class CompareUtil {
 		for (final Entry<String, TestSet> version : changedTraceTests.getVersions().entrySet()) {
 			final EvaluationVersion evalVersion = new EvaluationVersion();
 			// version.set
-			for (final Map.Entry<ChangedEntity, List<String>> clazz : version.getValue().entrySet()) {
+			for (final Entry<ChangedEntity, Set<String>> clazz : version.getValue().entrySet()) {
 				evalVersion.getTestcaseExecutions().put(clazz.getKey().getJavaClazzName(), clazz.getValue().size());
 			}
 			ticData.getVersions().put(version.getKey(), evalVersion);

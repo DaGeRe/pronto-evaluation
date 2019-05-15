@@ -3,7 +3,8 @@ package de.peran.evaluation.infinitest;
 import java.io.File;
 import java.util.List;
 
-import org.infinitest.ClasspathProvider;
+import org.infinitest.environment.ClasspathProvider;
+
 
 /**
  * Mimics StandaloneClasspath from Infinitest.
@@ -35,10 +36,10 @@ public class StandaloneClasspath implements ClasspathProvider {
 		return classDirs;
 	}
 
-	@Override
-	public String getCompleteClasspath() {
-		return classpath;
-	}
+//	@Override
+//	public String getCompleteClasspath() {
+//		return classpath;
+//	}
 
 	@Override
 	public String toString() {
@@ -49,5 +50,11 @@ public class StandaloneClasspath implements ClasspathProvider {
 	public List<File> classDirectoriesInClasspath() {
 		return classDirsInClasspath;
 	}
+
+   @Override
+   public String getRunnerFullClassPath() {
+      // TODO Auto-generated method stub
+      return classpath;
+   }
 
 }
