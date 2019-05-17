@@ -15,7 +15,7 @@ import de.peran.evaluation.base.CompareUtil;
 import de.peran.evaluation.base.EvaluationProject;
 
 /**
- * Prints tests which would have been executed by EKSTAZI, Infinitest and DePeC.
+ * Prints tests which would have been executed by EKSTAZI, Infinitest and PRONTO.
  * 
  * @author reichelt
  *
@@ -39,7 +39,7 @@ public final class CompareEvaluations {
 		for (final File dependencies : peassFolder.listFiles()) {
 			if (dependencies.getName().startsWith("deps_")) {
 				final String project = dependencies.getName().substring(5, dependencies.getName().indexOf('.'));
-				final File executefile = new File(peassFolder, "execute" + project + ".json");
+				final File executefile = new File(peassFolder, "execute_" + project + ".json");
 				if (executefile.exists()) {
 					count++;
 					try {
@@ -50,35 +50,39 @@ public final class CompareEvaluations {
 
 						final ExecutionData changedTraceTests = objectMapper.readValue(executefile, ExecutionData.class);
 
-						final EvaluationProject ticData = CompareUtil.createEvaluationData(changedTraceTests);
+						final EvaluationProject prontoData = CompareUtil.createEvaluationData(changedTraceTests);
 
-						final File emptyFile = new File(evaluationFolder, "evaluation_" + project + "_empty.json");
-						final File ekstaziFile = new File(evaluationFolder, "evaluation_" + project + "_ekstazi.json");
-						final File infinitestFile = new File(evaluationFolder, "evaluation_" + project + "_infinitest.json");
+						final File emptyFile = new File(evaluationFolder, project + "_empty.json");
+						final File ekstaziFile = new File(evaluationFolder, project + "_ekstazi.json");
+						final File infinitestFile = new File(evaluationFolder, project + "_infinitest.json");
+						
+						if (ekstaziFile.exists() && infinitestFile.exists()) {
+						   int infinitestCount = 1;
+	                  int emptyCount = 1;
+	                  int size = 1;
+	                  if (emptyFile.exists()) {
+	                     final EvaluationProject emptyData = objectMapper.readValue(emptyFile, EvaluationProject.class);
+	                     emptyCount = emptyData.getOverallTestCount();
+	                     size = emptyData.getVersions().size();
+	                  }
 
-						int infinitestCount = 1;
-						int emptyCount = 1;
-						int size = 1;
-						if (emptyFile.exists()) {
-							final EvaluationProject emptyData = objectMapper.readValue(emptyFile, EvaluationProject.class);
-							emptyCount = emptyData.getOverallTestCount();
-							size = emptyData.getVersions().size();
+	                  final EvaluationProject ekstaziData = objectMapper.readValue(ekstaziFile, EvaluationProject.class);
+	                  if (infinitestFile.exists()) {
+	                     final EvaluationProject infinitestData = objectMapper.readValue(infinitestFile, EvaluationProject.class);
+	                     infinitestCount = infinitestData.getOverallTestCount();
+	                  }
+
+	                  System.out.println(project + ";" + size + ";" + emptyCount + ";" + ekstaziData.getOverallTestCount() + ";"
+	                        + PERCENT_FORMAT.format(PERCENT * ekstaziData.getOverallTestCount() / emptyCount) + "%;" + infinitestCount + ";"
+	                        + PERCENT_FORMAT.format(PERCENT * infinitestCount / emptyCount) + "%;" + prontoData.getOverallTestCount() + ";"
+	                        + PERCENT_FORMAT.format(PERCENT * prontoData.getOverallTestCount() / emptyCount) + "%");
+
+	                  ekstaziSum += (PERCENT * ekstaziData.getOverallTestCount() / emptyCount);
+	                  infiniSum += (PERCENT * infinitestCount / emptyCount);
+	                  ticSum += (PERCENT * prontoData.getOverallTestCount() / emptyCount);
 						}
 
-						final EvaluationProject ekstaziData = objectMapper.readValue(ekstaziFile, EvaluationProject.class);
-						if (infinitestFile.exists()) {
-							final EvaluationProject infinitestData = objectMapper.readValue(infinitestFile, EvaluationProject.class);
-							infinitestCount = infinitestData.getOverallTestCount();
-						}
-
-						System.out.println(project + ";" + size + ";" + emptyCount + ";" + ekstaziData.getOverallTestCount() + ";"
-								+ PERCENT_FORMAT.format(PERCENT * ekstaziData.getOverallTestCount() / emptyCount) + "%;" + infinitestCount + ";"
-								+ PERCENT_FORMAT.format(PERCENT * infinitestCount / emptyCount) + "%;" + ticData.getOverallTestCount() + ";"
-								+ PERCENT_FORMAT.format(PERCENT * ticData.getOverallTestCount() / emptyCount) + "%");
-
-						ekstaziSum += (PERCENT * ekstaziData.getOverallTestCount() / emptyCount);
-						infiniSum += (PERCENT * infinitestCount / emptyCount);
-						ticSum += (PERCENT * ticData.getOverallTestCount() / emptyCount);
+						
 					} catch (final IOException e) {
 						e.printStackTrace();
 					}

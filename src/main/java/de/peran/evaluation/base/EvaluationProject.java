@@ -3,6 +3,8 @@ package de.peran.evaluation.base;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Saves the url and the EvaluationVersions for every version or a project.
  * 
@@ -29,6 +31,7 @@ public class EvaluationProject {
 		this.versions = versions;
 	}
 
+	@JsonIgnore
 	public int getOverallTestCount() {
 		int tests = 0;
 		for (final Map.Entry<String, EvaluationVersion> test : versions.entrySet()) {

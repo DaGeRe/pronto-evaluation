@@ -3,6 +3,8 @@ package de.peran.evaluation.base;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Saves how many testcases for each test class are executed.
  * 
@@ -20,6 +22,7 @@ public class EvaluationVersion {
 		this.testcaseExecutions = testcaseExecutions;
 	}
 
+	@JsonIgnore
 	public int getTestCount() {
 		int tests = 0;
 		for (final Integer testCount : testcaseExecutions.values()) {
