@@ -14,14 +14,14 @@ import de.peran.evaluation.base.Evaluator;
  * @author reichelt
  *
  */
-public class EmptyEvaluation extends Evaluator {
+public class EmptyEvaluator extends Evaluator {
 
 	public static void main(final String[] args) throws ParseException {
-		final Evaluator evaluator = new EmptyEvaluation(args);
+		final Evaluator evaluator = new EmptyEvaluator(args);
 		evaluator.evaluate();
 	}
 
-	public EmptyEvaluation(final String[] args) throws ParseException {
+	public EmptyEvaluator(final String[] args) throws ParseException {
 		super("empty", args);
 	}
 
