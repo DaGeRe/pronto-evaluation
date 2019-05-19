@@ -49,7 +49,8 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 
 	@Override
    public Process buildProcess(final File logFile, final String... commandLineAddition) throws IOException {
-		final String[] originals = new String[] { "mvn", "clean", "test", "-fn", "-Dcheckstyle.skip=true",
+	   // Attention: No clean for infinitest possible!
+		final String[] originals = new String[] { "mvn", "test", "-fn", "-Dcheckstyle.skip=true",
 				"-Dmaven.compiler.source=1.7", "-Dmaven.compiler.target=1.7", "-Dmaven.javadoc.skip=true" };
 		final String[] vars = new String[commandLineAddition.length + originals.length];
 		for (int i = 0; i < originals.length; i++) {

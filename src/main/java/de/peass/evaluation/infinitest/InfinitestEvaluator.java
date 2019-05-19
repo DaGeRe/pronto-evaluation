@@ -2,6 +2,7 @@ package de.peass.evaluation.infinitest;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
@@ -57,15 +58,7 @@ public class InfinitestEvaluator extends Evaluator {
 
 			if (pomFile.exists()) {
 				try {
-					final Model model = reader.read(new FileInputStream(pomFile));
-					if (model.getBuild() == null) {
-						model.setBuild(new Build());
-					}
-					final Plugin compiler = MavenPomUtil.findPlugin(model, MavenPomUtil.COMPILER_ARTIFACTID, MavenPomUtil.ORG_APACHE_MAVEN_PLUGINS);
-					MavenPomUtil.setIncrementalBuild(compiler, false);
-
-					final MavenXpp3Writer writer = new MavenXpp3Writer();
-					writer.write(new FileWriter(pomFile), model);
+					enableIncrementalBuilding(pomFile, reader);
 
 					final ProcessBuilder pb = new ProcessBuilder(new String[] { "mvn", "compile", "test-compile" });
 					pb.directory(folders.getProjectFolder());
@@ -109,6 +102,18 @@ public class InfinitestEvaluator extends Evaluator {
 		}
 
 	}
+
+   public void enableIncrementalBuilding(final File pomFile, final MavenXpp3Reader reader) throws IOException, XmlPullParserException, FileNotFoundException {
+      final Model model = reader.read(new FileInputStream(pomFile));
+      if (model.getBuild() == null) {
+      	model.setBuild(new Build());
+      }
+      final Plugin compiler = MavenPomUtil.findPlugin(model, MavenPomUtil.COMPILER_ARTIFACTID, MavenPomUtil.ORG_APACHE_MAVEN_PLUGINS);
+      MavenPomUtil.setIncrementalBuild(compiler, false);
+
+      final MavenXpp3Writer writer = new MavenXpp3Writer();
+      writer.write(new FileWriter(pomFile), model);
+   }
 
 	private Set<JavaClass> getChangedClasses(final FileChangeDetector changeDetector, final ClassFileIndex index) throws IOException {
 		final Set<File> changedFiles = changeDetector.findChangedFiles();
