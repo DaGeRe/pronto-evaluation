@@ -1,4 +1,4 @@
-package de.peran.evaluation;
+package de.peass.evaluation;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import de.peass.dependency.persistence.ExecutionData;
-import de.peran.evaluation.base.CompareUtil;
-import de.peran.evaluation.base.EvaluationProject;
+import de.peass.evaluation.base.CompareUtil;
+import de.peass.evaluation.base.EvaluationProject;
 
 /**
  * Prints tests which would have been executed by EKSTAZI, Infinitest and PRONTO.

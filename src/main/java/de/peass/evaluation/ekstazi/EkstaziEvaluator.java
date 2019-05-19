@@ -1,4 +1,4 @@
-package de.peran.evaluation.ekstazi;
+package de.peass.evaluation.ekstazi;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,8 +7,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.peran.evaluation.base.EvaluationVersion;
-import de.peran.evaluation.base.Evaluator;
+import de.peass.evaluation.base.EvaluationVersion;
+import de.peass.evaluation.base.Evaluator;
 
 /**
  * Runs the tests of all versions with Ekstazi in order to determine the count of tests ekstazi would have run.
@@ -28,7 +28,7 @@ public class EkstaziEvaluator extends Evaluator {
 		final File resultFile = folders.getResultFolder("ekstazi");
 		int i = 0;
 		while (iterator.hasNextCommit()) {
-			iterator.goToNextCommit();
+			iterator.goToNextCommitSoft();
 			
 			final File pomFile = new File(folders.getProjectFolder(), "pom.xml");
 			if (pomFile.exists()) {
@@ -45,6 +45,9 @@ public class EkstaziEvaluator extends Evaluator {
 	               e.printStackTrace();
 	            }
 	         }
+	         if (iterator.getTag().equals("160178688b42e26262b6aa9e277646b8865960b7")) {
+               System.out.println("Test");
+            }
 			}
 
 			i++;

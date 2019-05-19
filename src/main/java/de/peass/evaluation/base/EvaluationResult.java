@@ -1,4 +1,4 @@
-package de.peran.evaluation.base;
+package de.peass.evaluation.base;
 
 /**
  * Result of one evaluation process with the methods that have been run in both and with the methods that would have been run in the evaluated project

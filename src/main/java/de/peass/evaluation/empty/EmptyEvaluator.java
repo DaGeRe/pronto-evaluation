@@ -1,12 +1,12 @@
-package de.peran.evaluation.empty;
+package de.peass.evaluation.empty;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.cli.ParseException;
 
-import de.peran.evaluation.base.EvaluationVersion;
-import de.peran.evaluation.base.Evaluator;
+import de.peass.evaluation.base.EvaluationVersion;
+import de.peass.evaluation.base.Evaluator;
 
 /**
  * Determines how much tests are executed without test selection.

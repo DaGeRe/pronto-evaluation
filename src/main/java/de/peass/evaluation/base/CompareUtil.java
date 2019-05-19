@@ -1,4 +1,4 @@
-package de.peran.evaluation.base;
+package de.peass.evaluation.base;
 
 import java.util.List;
 import java.util.Map;

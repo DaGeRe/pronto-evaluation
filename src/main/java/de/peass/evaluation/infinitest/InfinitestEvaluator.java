@@ -1,4 +1,4 @@
-package de.peran.evaluation.infinitest;
+package de.peass.evaluation.infinitest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,8 +23,8 @@ import org.infinitest.parser.ClassFileIndex;
 import org.infinitest.parser.JavaClass;
 
 import de.peass.dependency.execution.MavenPomUtil;
-import de.peran.evaluation.base.EvaluationVersion;
-import de.peran.evaluation.base.Evaluator;
+import de.peass.evaluation.base.EvaluationVersion;
+import de.peass.evaluation.base.Evaluator;
 
 /**
  * Runs all the tests of all versions with infinitest in order to determine the count of tests infinitest would run
@@ -53,7 +53,7 @@ public class InfinitestEvaluator extends Evaluator {
 		final MavenXpp3Reader reader = new MavenXpp3Reader();
 		int i = 0;
 		while (iterator.hasNextCommit()) {
-			iterator.goToNextCommit();
+			iterator.goToNextCommitSoft();
 
 			if (pomFile.exists()) {
 				try {

@@ -1,4 +1,4 @@
-package de.peran.evaluation;
+package de.peass.evaluation;
 
 import java.io.File;
 import java.io.IOException;

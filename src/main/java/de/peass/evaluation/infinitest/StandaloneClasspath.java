@@ -1,4 +1,4 @@
-package de.peran.evaluation.infinitest;
+package de.peass.evaluation.infinitest;
 
 import java.io.File;
 import java.util.List;
