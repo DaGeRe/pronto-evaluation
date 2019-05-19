@@ -69,17 +69,8 @@ public class InfinitestEvaluator extends Evaluator {
 
 					System.out.println("All changes: " + changedClasses);
 
-					String testname = "";
 					final EvaluationVersion currentVersion = new EvaluationVersion();
-					for (final Iterator<JavaClass> clazzIterator = changedClasses.iterator(); clazzIterator.hasNext();) {
-						final JavaClass clazz = clazzIterator.next();
-						if (!clazz.isATest()) {
-							clazzIterator.remove();
-						} else {
-							currentVersion.getTestcaseExecutions().put(clazz.getName(), 0);
-							testname += clazz.getName() + ",";
-						}
-					}
+					String testname = buildTestString(changedClasses, currentVersion);
 
 					if (currentVersion.getTestcaseExecutions().size() > 0) {
 						testname = testname.substring(0, testname.length() - 1);
@@ -102,6 +93,20 @@ public class InfinitestEvaluator extends Evaluator {
 		}
 
 	}
+
+   public String buildTestString(final Set<JavaClass> changedClasses, final EvaluationVersion currentVersion) {
+      String testname = "";
+      for (final Iterator<JavaClass> clazzIterator = changedClasses.iterator(); clazzIterator.hasNext();) {
+      	final JavaClass clazz = clazzIterator.next();
+      	if (!clazz.isATest()) {
+      		clazzIterator.remove();
+      	} else {
+      		currentVersion.getTestcaseExecutions().put(clazz.getName(), 0);
+      		testname += clazz.getName() + ",";
+      	}
+      }
+      return testname;
+   }
 
    public void enableIncrementalBuilding(final File pomFile, final MavenXpp3Reader reader) throws IOException, XmlPullParserException, FileNotFoundException {
       final Model model = reader.read(new FileInputStream(pomFile));
