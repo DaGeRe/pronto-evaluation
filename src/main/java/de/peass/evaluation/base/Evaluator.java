@@ -70,19 +70,6 @@ public abstract class Evaluator {
 		iterator = new VersionIteratorGit(projectFolder, commits, null);
 
 		executor = new SysoutTestExecutor(projectFolder);
-		//TODO Ersten Lauffähigen suchen
-//		executor.searchFirstRunningCommit(iterator, executor, projectFolder);
-
-//		debugFolder = new File(projectFolder, "debug_" + type);
-//		if (!debugFolder.exists()) {
-//			debugFolder.mkdir();
-//		}
-//		System.out.println("Commit: " + iterator.getTag());
-//
-//		resultFolder = new File("evaluation_results");
-//		if (!resultFolder.exists()) {
-//			resultFolder.mkdir();
-//		}
 
 		evaluation = new EvaluationProject();
 		evaluation.setUrl(url);
@@ -101,14 +88,15 @@ public abstract class Evaluator {
 		final EvaluationVersion currentVersion = new EvaluationVersion();
 		try (BufferedReader reader = new BufferedReader(new FileReader(currentFile))) {
 			String line;
-			boolean inTests = true;
+			boolean inTests = false;
 			// Map<String, Integer> tests = new HashMap<>();
 			while ((line = reader.readLine()) != null) {
-				if (line.equals("-------------------------------------------------------")) {
+				if (line.contains("-------------------------------------------------------")) {
 					final String test = reader.readLine();
 					final String nextLine = reader.readLine();
-					if (test.contains("T E S T S")
-							&& nextLine.equals("-------------------------------------------------------")) {
+					if ( test != null && 
+					      test.contains("T E S T S")
+							&& nextLine.contains("-------------------------------------------------------")) {
 						inTests = true;
 					}
 				}
@@ -116,14 +104,14 @@ public abstract class Evaluator {
 				if (inTests) {
 					LOG.trace("Line: {}", line);
 					final String runningString = "Running ";
-					if (line.startsWith(runningString)) {
+					if (line.contains(runningString)) {
 						final String testname = line.substring(runningString.length());
 						final String testsRun = reader.readLine();
 						LOG.trace("Line: {}", testsRun);
 						final String testsRunString = "Tests run: ";
-						if (testsRun != null && testsRun.startsWith(testsRunString)) {
+						if (testsRun != null && testsRun.contains(testsRunString)) {
 							final String[] splitted = testsRun.split(",");
-							final String runCount = splitted[0].substring(testsRunString.length());
+							final String runCount = splitted[0].substring(splitted[0].lastIndexOf(' ')+1);
 							final int count = Integer.parseInt(runCount);
 							LOG.info("Test: " + testname + " " + count);
 							currentVersion.getTestcaseExecutions().put(testname, count);

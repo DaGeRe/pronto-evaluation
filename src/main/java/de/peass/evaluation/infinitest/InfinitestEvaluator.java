@@ -60,7 +60,7 @@ public class InfinitestEvaluator extends Evaluator {
 				try {
 					enableIncrementalBuilding(pomFile, reader);
 
-					final ProcessBuilder pb = new ProcessBuilder(new String[] { "mvn", "compile", "test-compile" });
+					final ProcessBuilder pb = new ProcessBuilder(new String[] { "mvn", "-B", "compile", "test-compile" });
 					pb.directory(folders.getProjectFolder());
 
 					pb.start().waitFor();

@@ -45,9 +45,6 @@ public class EkstaziEvaluator extends Evaluator {
 	               e.printStackTrace();
 	            }
 	         }
-	         if (iterator.getTag().equals("160178688b42e26262b6aa9e277646b8865960b7")) {
-               System.out.println("Test");
-            }
 			}
 
 			i++;
