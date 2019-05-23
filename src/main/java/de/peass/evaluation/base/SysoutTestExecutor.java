@@ -35,7 +35,7 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 
 	private static final int SECOND = 1000;
 
-	private static final int DEFAULT_TIMEOUT = 5;
+	public static final int DEFAULT_TIMEOUT = 5;
 
 	private static final Logger LOG = LogManager.getLogger(SysoutTestExecutor.class);
 
@@ -95,7 +95,7 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 		}
 	}
 
-	private void waitForProcess(final Process process) throws InterruptedException {
+	public static void waitForProcess(final Process process) throws InterruptedException {
 		LOG.info("Starting Process");
 		process.waitFor(DEFAULT_TIMEOUT, TimeUnit.MINUTES);
 		if (process.isAlive()) {

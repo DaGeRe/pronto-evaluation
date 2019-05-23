@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
@@ -26,6 +27,7 @@ import org.infinitest.parser.JavaClass;
 import de.peass.dependency.execution.MavenPomUtil;
 import de.peass.evaluation.base.EvaluationVersion;
 import de.peass.evaluation.base.Evaluator;
+import de.peass.evaluation.base.SysoutTestExecutor;
 
 /**
  * Runs all the tests of all versions with infinitest in order to determine the count of tests infinitest would run
@@ -60,20 +62,16 @@ public class InfinitestEvaluator extends Evaluator {
 				try {
 					enableIncrementalBuilding(pomFile, reader);
 
-					final ProcessBuilder pb = new ProcessBuilder(new String[] { "mvn", "-B", "compile", "test-compile" });
-					pb.directory(folders.getProjectFolder());
-
-					pb.start().waitFor();
+					compileInfinitest();
 
 					final Set<JavaClass> changedClasses = getChangedClasses(changeDetector, index);
 
 					System.out.println("All changes: " + changedClasses);
 
 					final EvaluationVersion currentVersion = new EvaluationVersion();
-					String testname = buildTestString(changedClasses, currentVersion);
 
 					if (currentVersion.getTestcaseExecutions().size() > 0) {
-						testname = testname.substring(0, testname.length() - 1);
+					   String testname = buildTestString(changedClasses, currentVersion);
 						final File currentFile =  folders.getResultFile(i, iterator.getTag());
 
 						executor.executeTests(currentFile, testname);
@@ -94,6 +92,15 @@ public class InfinitestEvaluator extends Evaluator {
 
 	}
 
+   public void compileInfinitest() throws IOException, InterruptedException {
+      final ProcessBuilder pb = new ProcessBuilder(new String[] { "mvn", "-B", "compile", "test-compile" });
+      pb.directory(folders.getProjectFolder());
+
+      Process process = pb.start();
+      process.waitFor(SysoutTestExecutor.DEFAULT_TIMEOUT, TimeUnit.MINUTES);
+      SysoutTestExecutor.waitForProcess(process);
+   }
+
    public String buildTestString(final Set<JavaClass> changedClasses, final EvaluationVersion currentVersion) {
       String testname = "";
       for (final Iterator<JavaClass> clazzIterator = changedClasses.iterator(); clazzIterator.hasNext();) {
@@ -105,6 +112,7 @@ public class InfinitestEvaluator extends Evaluator {
       		testname += clazz.getName() + ",";
       	}
       }
+      testname = testname.substring(0, testname.length() - 1);
       return testname;
    }
 
