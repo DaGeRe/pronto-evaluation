@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,6 +27,8 @@ public class EkstaziEvaluator extends Evaluator {
 
 	@Override
 	public void evaluate() {
+	   cleanup();
+	   
 		final File resultFile = folders.getResultFolder("ekstazi");
 		int i = 0;
 		while (iterator.hasNextCommit()) {
@@ -45,11 +49,20 @@ public class EkstaziEvaluator extends Evaluator {
 	               e.printStackTrace();
 	            }
 	         }
-			}
+			} 
 
 			i++;
 		}
 	}
+
+   public void cleanup() {
+      File oldEkstaziFolder = new File(folders.getProjectFolder(), ".ekstazi");
+	   try {
+         FileUtils.deleteDirectory(oldEkstaziFolder);
+      } catch (IOException e1) {
+         e1.printStackTrace();
+      }
+   }
 	
 	public static void main(final String[] args) throws ParseException {
 		final Evaluator evaluator = new EkstaziEvaluator(args);
