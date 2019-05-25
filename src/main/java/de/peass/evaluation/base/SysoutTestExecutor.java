@@ -106,16 +106,38 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 		LOG.info("Starting Process");
 		process.waitFor(DEFAULT_TIMEOUT, TimeUnit.MINUTES);
 		LOG.info("Process finished..");
-		if (process.isAlive()) {
-		   LOG.debug("Destroy...");
-			process.destroy();
-			while (process.isAlive()) {
-			   LOG.debug("Kill...");
-				process.destroyForcibly();
-				Thread.sleep(SECOND);
-			}
-		}
+		Thread killerThread = new Thread(new Runnable() {
+         
+         @Override
+         public void run() {
+            LOG.info("Checking isAlive-state");
+            if (process.isAlive()) {
+               LOG.debug("Destroy...");
+               process.destroy();
+               destoryhard(process);
+            }
+         }
+
+         
+      });
+		killerThread.wait(1000);
+		LOG.info("Destroying took too long..");
+		process.destroyForcibly();
+		LOG.info("Destroy-message sent");
+		destoryhard(process);
 	}
+	
+	public static void destoryhard(final Process process) {
+      while (process.isAlive()) {
+         LOG.debug("Kill...");
+         process.destroyForcibly();
+         try {
+            Thread.sleep(SECOND);
+         } catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+      }
+   }
 
 	@Override
    public void preparePom() {
