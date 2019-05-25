@@ -35,7 +35,7 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 
 	private static final int SECOND = 1000;
 
-	public static final int DEFAULT_TIMEOUT = 5;
+	public static final int DEFAULT_TIMEOUT = 3;
 
 	private static final Logger LOG = LogManager.getLogger(SysoutTestExecutor.class);
 
@@ -50,8 +50,15 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 	@Override
    public Process buildProcess(final File logFile, final String... commandLineAddition) throws IOException {
 	   // Attention: No clean for infinitest possible!
-		final String[] originals = new String[] { "mvn", "-B", "test", "-fn", "-Dcheckstyle.skip=true",
-				"-Dmaven.compiler.source=1.7", "-Dmaven.compiler.target=1.7", "-Dmaven.javadoc.skip=true" };
+		final String[] originals = new String[] { "mvn", "-B", "test", "-fn", 
+		      "-Dcheckstyle.skip=true",
+				"-Dmaven.compiler.source=1.7", 
+				"-Dmaven.compiler.target=1.7", 
+				"-Dmaven.javadoc.skip=true",
+				"-Denforcer.skip=true",
+            "-DfailIfNoTests=false",
+            "-Drat.skip=true",
+            "-Djacoco.skip=true",};
 		final String[] vars = new String[commandLineAddition.length + originals.length];
 		for (int i = 0; i < originals.length; i++) {
 			vars[i] = originals[i];
@@ -98,9 +105,12 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 	public static void waitForProcess(final Process process) throws InterruptedException {
 		LOG.info("Starting Process");
 		process.waitFor(DEFAULT_TIMEOUT, TimeUnit.MINUTES);
+		LOG.info("Process finished..");
 		if (process.isAlive()) {
+		   LOG.debug("Destroy...");
 			process.destroy();
 			while (process.isAlive()) {
+			   LOG.debug("Kill...");
 				process.destroyForcibly();
 				Thread.sleep(SECOND);
 			}

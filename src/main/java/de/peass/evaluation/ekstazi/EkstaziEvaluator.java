@@ -36,24 +36,28 @@ public class EkstaziEvaluator extends Evaluator {
 			
 			final File pomFile = new File(folders.getProjectFolder(), "pom.xml");
 			if (pomFile.exists()) {
-			   final File currentFile = folders.getResultFile(i, iterator.getTag());
-	         executor.preparePom();
-	         executor.executeAllKoPeMeTests(currentFile);
-
-	         final EvaluationVersion currentVersion = getTestsFromFile(currentFile);
-	         if (currentVersion.getTestcaseExecutions().size() > 0) {
-	            evaluation.getVersions().put(iterator.getTag(), currentVersion);
-	            try {
-	               OBJECTMAPPER.writeValue(resultFile, evaluation);
-	            } catch (final IOException e) {
-	               e.printStackTrace();
-	            }
-	         }
+			   analyzeVersion(resultFile, i);
 			} 
 
 			i++;
 		}
 	}
+
+   public void analyzeVersion(final File resultFile, int i) {
+      final File currentFile = folders.getResultFile(i, iterator.getTag());
+      executor.preparePom();
+      executor.executeAllKoPeMeTests(currentFile);
+
+      final EvaluationVersion currentVersion = getTestsFromFile(currentFile);
+      if (currentVersion.getTestcaseExecutions().size() > 0) {
+         evaluation.getVersions().put(iterator.getTag(), currentVersion);
+         try {
+            OBJECTMAPPER.writeValue(resultFile, evaluation);
+         } catch (final IOException e) {
+            e.printStackTrace();
+         }
+      }
+   }
 
    public void cleanup() {
       File oldEkstaziFolder = new File(folders.getProjectFolder(), ".ekstazi");

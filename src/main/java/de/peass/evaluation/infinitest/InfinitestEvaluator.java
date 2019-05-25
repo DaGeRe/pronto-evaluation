@@ -59,38 +59,41 @@ public class InfinitestEvaluator extends Evaluator {
 			iterator.goToNextCommitSoft();
 
 			if (pomFile.exists()) {
-				try {
-					enableIncrementalBuilding(pomFile, reader);
-
-					compileInfinitest();
-
-					final Set<JavaClass> changedClasses = getChangedClasses(changeDetector, index);
-
-					System.out.println("All changes: " + changedClasses);
-
-					final EvaluationVersion currentVersion = new EvaluationVersion();
-
-					if (currentVersion.getTestcaseExecutions().size() > 0) {
-					   String testname = buildTestString(changedClasses, currentVersion);
-						final File currentFile =  folders.getResultFile(i, iterator.getTag());
-
-						executor.executeTests(currentFile, testname);
-
-						final EvaluationVersion adjustedVersion = getTestsFromFile(currentFile);
-						evaluation.getVersions().put(iterator.getTag(), adjustedVersion);
-						OBJECTMAPPER.writeValue(resultFile, evaluation);
-					}
-
-					System.out.println("Tests 2: " + changedClasses);
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
-
+				analyzeVersion(pomFile, changeDetector, resultFile, index, reader, i);
 			}
 			i++;
 		}
 
 	}
+
+   public void analyzeVersion(final File pomFile, final FileChangeDetector changeDetector, final File resultFile, final ClassFileIndex index, final MavenXpp3Reader reader, int i) {
+      try {
+      	enableIncrementalBuilding(pomFile, reader);
+
+      	compileInfinitest();
+
+      	final Set<JavaClass> changedClasses = getChangedClasses(changeDetector, index);
+
+      	System.out.println("All changes: " + changedClasses);
+
+      	final EvaluationVersion currentVersion = new EvaluationVersion();
+
+      	if (currentVersion.getTestcaseExecutions().size() > 0) {
+      	   String testname = buildTestString(changedClasses, currentVersion);
+      		final File currentFile =  folders.getResultFile(i, iterator.getTag());
+
+      		executor.executeTests(currentFile, testname);
+
+      		final EvaluationVersion adjustedVersion = getTestsFromFile(currentFile);
+      		evaluation.getVersions().put(iterator.getTag(), adjustedVersion);
+      		OBJECTMAPPER.writeValue(resultFile, evaluation);
+      	}
+
+      	System.out.println("Tests 2: " + changedClasses);
+      } catch (final Exception e) {
+      	e.printStackTrace();
+      }
+   }
 
    public void compileInfinitest() throws IOException, InterruptedException {
       final ProcessBuilder pb = new ProcessBuilder(new String[] { "mvn", "-B", "compile", "test-compile" });
