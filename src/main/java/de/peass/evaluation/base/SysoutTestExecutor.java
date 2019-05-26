@@ -120,7 +120,8 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 
          
       });
-		killerThread.wait(1000);
+		killerThread.start();
+		killerThread.join(1000);
 		LOG.info("Destroying took too long..");
 		process.destroyForcibly();
 		LOG.info("Destroy-message sent");
