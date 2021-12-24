@@ -2,16 +2,17 @@ package de.peass.evaluation.base;
 
 import java.io.File;
 
-import de.peass.dependency.PeASSFolders;
+import de.dagere.peass.folders.PeassFolders;
 
-public class EvaluationFolders extends PeASSFolders {
+
+public class EvaluationFolders extends PeassFolders {
 
 //   private final File ekstaziFolder;
 //   private final File pureFolder;
 //   private final File infinitestFolder;
    private File typeFolder;
    
-   public EvaluationFolders(File projectFolder) {
+   public EvaluationFolders(final File projectFolder) {
       super(projectFolder);
       
 //      ekstaziFolder = new File(peassFolder, "ekstazi");
@@ -26,13 +27,13 @@ public class EvaluationFolders extends PeASSFolders {
 //      return new File(ekstaziFolder, "log_" + i + "_" + tag + ".txt");
 //   }
 
-   public File getResultFolder(String type) {
+   public File getResultFolder(final String type) {
       typeFolder = new File(peassFolder, type);
       typeFolder.mkdirs();
       return new File(typeFolder, projectFolder.getName() + "_" + type + ".json");
    }
 
-   public File getResultFile(int i, String tag) {
+   public File getResultFile(final int i, final String tag) {
       return new File(typeFolder, "log_" + i + "_" + tag + ".txt");
    }
 

@@ -7,24 +7,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import de.peass.DependencyReadingStarter;
-import de.peass.dependency.PeASSFolders;
-import de.peass.utils.OptionConstants;
-import de.peass.vcs.GitCommit;
-import de.peass.vcs.GitUtils;
-import de.peass.vcs.VersionIterator;
-import de.peass.vcs.VersionIteratorGit;
+import de.dagere.peass.config.ExecutionConfig;
+import de.dagere.peass.vcs.CommitUtil;
+import de.dagere.peass.vcs.GitCommit;
+import de.dagere.peass.vcs.GitUtils;
+import de.dagere.peass.vcs.VersionIterator;
+import de.dagere.peass.vcs.VersionIteratorGit;
 
 /**
  * Base class for those classes who evaluate a method against DePeC. Therefore, the evaluation itself for the specific method needs to be added.
@@ -48,13 +43,7 @@ public abstract class Evaluator {
 	protected final EvaluationProject evaluation;
 	protected final SysoutTestExecutor executor;
 
-	public Evaluator(final String type, final String[] args) throws ParseException {
-		final Options options = OptionConstants.createOptions(OptionConstants.FOLDER, OptionConstants.STARTVERSION, OptionConstants.ENDVERSION, OptionConstants.OUT);
-
-		final CommandLineParser parser = new DefaultParser();
-		final CommandLine line = parser.parse(options, args);
-
-		final File projectFolder = new File(line.getOptionValue(OptionConstants.FOLDER.getName()));
+	public Evaluator(final String type, final ExecutionConfig config, final File projectFolder)  {
 
 		File outputFile = projectFolder.getParentFile();
 		if (outputFile.isDirectory()) {
@@ -65,7 +54,7 @@ public abstract class Evaluator {
 		this.folders = new EvaluationFolders(projectFolder);
 
 		final String url = GitUtils.getURL(projectFolder);
-		final List<GitCommit> commits = DependencyReadingStarter.getGitCommits(line, projectFolder);
+		final List<GitCommit> commits = CommitUtil.getGitCommits(config.getStartversion(), config.getEndversion(), projectFolder);
 
 		iterator = new VersionIteratorGit(projectFolder, commits, null);
 
@@ -75,7 +64,7 @@ public abstract class Evaluator {
 		evaluation.setUrl(url);
 	}
 
-	public abstract void evaluate();
+	public abstract void evaluate() throws IOException, InterruptedException, XmlPullParserException;
 
 	/**
 	 * Reads tests from a file container a maven test output.

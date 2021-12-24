@@ -2,7 +2,6 @@ package de.peass.evaluation;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -15,10 +14,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import de.peass.DependencyReadingStarter;
-import de.peass.dependency.analysis.data.ChangedEntity;
-import de.peass.dependency.analysis.data.TestSet;
-import de.peass.dependency.persistence.ExecutionData;
+import de.dagere.peass.dependency.analysis.data.ChangedEntity;
+import de.dagere.peass.dependency.analysis.data.TestSet;
+import de.dagere.peass.dependency.persistence.ExecutionData;
 
 public class GetNonSelectedTests {
 
@@ -29,7 +27,7 @@ public class GetNonSelectedTests {
 		MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
 	}
 
-	public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
+	public static void main(final String[] args) throws JsonParseException, JsonMappingException, IOException {
 		final File allTestsFile = new File(args[0]);
 		final File selectedTestsFile = new File(args[1]);
 
@@ -63,6 +61,6 @@ public class GetNonSelectedTests {
 			LOG.debug("Size: " + allTestSet.classCount());
 			nonSelected.getVersions().put(allVersion.getKey(), allTestSet);
 		}
-		MAPPER.writeValue(new File(DependencyReadingStarter.getResultFolder(), "out.json"), nonSelected);
+		MAPPER.writeValue(new File("results", "out.json"), nonSelected);
 	}
 }

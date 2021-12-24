@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.maven.model.Build;
@@ -24,7 +23,8 @@ import org.infinitest.changedetect.FileChangeDetector;
 import org.infinitest.parser.ClassFileIndex;
 import org.infinitest.parser.JavaClass;
 
-import de.peass.dependency.execution.MavenPomUtil;
+import de.dagere.peass.config.ExecutionConfig;
+import de.dagere.peass.execution.maven.pom.MavenPomUtil;
 import de.peass.evaluation.base.EvaluationVersion;
 import de.peass.evaluation.base.Evaluator;
 import de.peass.evaluation.base.SysoutTestExecutor;
@@ -38,11 +38,11 @@ public class InfinitestEvaluator extends Evaluator {
 
 	private static final Logger LOG = LogManager.getLogger(InfinitestEvaluator.class);
 
-	public InfinitestEvaluator(final String[] args) throws ParseException {
-		super("infinitest", args);
-	}
+	public InfinitestEvaluator(final ExecutionConfig executionConfig, final File projectFolder) {
+	   super("infinitest", executionConfig,  projectFolder);
+   }
 
-	@Override
+   @Override
 	public void evaluate() {
 		final List<File> classPath = Arrays.asList(new File(folders.getProjectFolder(), "target/classes"), new File(folders.getProjectFolder(), "target/test-classes"));
 		final File pomFile = new File(folders.getProjectFolder(), "pom.xml");
@@ -66,7 +66,7 @@ public class InfinitestEvaluator extends Evaluator {
 
 	}
 
-   public void analyzeVersion(final File pomFile, final FileChangeDetector changeDetector, final File resultFile, final ClassFileIndex index, final MavenXpp3Reader reader, int i) {
+   public void analyzeVersion(final File pomFile, final FileChangeDetector changeDetector, final File resultFile, final ClassFileIndex index, final MavenXpp3Reader reader, final int i) {
       try {
       	enableIncrementalBuilding(pomFile, reader);
 
@@ -141,10 +141,4 @@ public class InfinitestEvaluator extends Evaluator {
 		changedClasses.addAll(changedParents);
 		return changedClasses;
 	}
-	
-	public static void main(final String[] args) throws IOException, XmlPullParserException, InterruptedException, ParseException {
-		final InfinitestEvaluator evaluator = new InfinitestEvaluator(args);
-		evaluator.evaluate();
-	}
-
 }

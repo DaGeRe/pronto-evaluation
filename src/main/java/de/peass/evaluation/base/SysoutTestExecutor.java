@@ -20,10 +20,10 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import de.peass.dependency.PeASSFolders;
-import de.peass.dependency.analysis.data.TestCase;
-import de.peass.dependency.execution.MavenPomUtil;
-import de.peass.dependency.execution.MavenTestExecutor;
+import de.dagere.peass.dependency.analysis.data.TestCase;
+import de.dagere.peass.execution.maven.pom.MavenTestExecutor;
+import de.dagere.peass.execution.utils.EnvironmentVariables;
+import de.dagere.peass.folders.PeassFolders;
 
 /**
  * Executes the tests of a maven project in order to read the amount of executed tests in the process sysout
@@ -44,11 +44,11 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 	public static final String COMPILER_ARTIFACTID = "maven-compiler-plugin";
 
 	public SysoutTestExecutor(final File projectFolder) {
-		super(new PeASSFolders(projectFolder), null, Integer.MAX_VALUE);
+		super(new PeassFolders(projectFolder), null, new EnvironmentVariables());
 	}
-
+	
 	@Override
-   public Process buildProcess(final File logFile, final String... commandLineAddition) throws IOException {
+   public Process buildMavenProcess(final File logFile, final String... commandLineAddition) throws IOException {
 	   // Attention: No clean for infinitest possible!
 		final String[] originals = new String[] { "mvn", "-B", "test", "-fn", 
 		      "-Dcheckstyle.skip=true",
@@ -79,21 +79,9 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 		return process;
 	}
 
-	@Override
-	public void executeAllKoPeMeTests(final File logFile) {
-		try {
-			final Process process = buildProcess(logFile);
-			waitForProcess(process);
-		} catch (final IOException e) {
-			e.printStackTrace();
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	public void executeTests(final File logFile, final String testname) {
 		try {
-			final Process process = buildProcess(logFile, "-Dtest=" + testname);
+			final Process process = buildMavenProcess(logFile, "-Dtest=" + testname);
 			waitForProcess(process);
 		} catch (final IOException e) {
 			e.printStackTrace();
@@ -139,37 +127,36 @@ public class SysoutTestExecutor extends MavenTestExecutor {
          }
       }
    }
-
+	
 	@Override
-   public void preparePom() {
-		final MavenXpp3Reader reader = new MavenXpp3Reader();
-		try {
-			final File pomFile = new File(folders.getProjectFolder(), "pom.xml");
-			final Model model = reader.read(new FileInputStream(pomFile));
-			if (model.getBuild() == null) {
-				model.setBuild(new Build());
-			}
+	public void prepareKoPeMeExecution(final File logFile) throws IOException, InterruptedException, XmlPullParserException {
+	   final MavenXpp3Reader reader = new MavenXpp3Reader();
+      try {
+         final File pomFile = new File(folders.getProjectFolder(), "pom.xml");
+         final Model model = reader.read(new FileInputStream(pomFile));
+         if (model.getBuild() == null) {
+            model.setBuild(new Build());
+         }
 
-			final Plugin ekstazi = new Plugin();
-			ekstazi.setGroupId("org.ekstazi");
-			ekstazi.setArtifactId("ekstazi-maven-plugin");
-			ekstazi.setVersion("5.2.0");
-			final PluginExecution ekstaziExecution = new PluginExecution();
-			ekstaziExecution.setGoals(Arrays.asList(new String[] { "select" }));
-			final List<PluginExecution> ekstaziExecutions = new LinkedList<>();
-			ekstaziExecutions.add(ekstaziExecution);
-			ekstazi.setExecutions(ekstaziExecutions);
+         final Plugin ekstazi = new Plugin();
+         ekstazi.setGroupId("org.ekstazi");
+         ekstazi.setArtifactId("ekstazi-maven-plugin");
+         ekstazi.setVersion("5.2.0");
+         final PluginExecution ekstaziExecution = new PluginExecution();
+         ekstaziExecution.setGoals(Arrays.asList(new String[] { "select" }));
+         final List<PluginExecution> ekstaziExecutions = new LinkedList<>();
+         ekstaziExecutions.add(ekstaziExecution);
+         ekstazi.setExecutions(ekstaziExecutions);
 
-			model.getBuild().getPlugins().add(ekstazi);
+         model.getBuild().getPlugins().add(ekstazi);
 
-			final MavenXpp3Writer writer = new MavenXpp3Writer();
-			writer.write(new FileWriter(pomFile), model);
-		} catch (IOException | XmlPullParserException e) {
-			e.printStackTrace();
-		}
+         final MavenXpp3Writer writer = new MavenXpp3Writer();
+         writer.write(new FileWriter(pomFile), model);
+      } catch (IOException | XmlPullParserException e) {
+         e.printStackTrace();
+      }
 	}
 
-	
 
 	@Override
 	public boolean isVersionRunning(final String version) {
@@ -177,10 +164,6 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 	   return true; // TODO Wieder echt prüfen
 	}
 
-   @Override
-   public List<File> getModules() throws IOException, XmlPullParserException {
-      return MavenPomUtil.getModules(new File(folders.getProjectFolder(), "pom.xml"));
-   }
 
    @Override
    public void executeTest(final TestCase tests, final File logFolder, final long timeout) {

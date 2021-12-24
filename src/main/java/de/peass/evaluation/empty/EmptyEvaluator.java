@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.commons.cli.ParseException;
 
+import de.dagere.peass.config.ExecutionConfig;
 import de.peass.evaluation.base.EvaluationVersion;
 import de.peass.evaluation.base.Evaluator;
 
@@ -16,13 +17,9 @@ import de.peass.evaluation.base.Evaluator;
  */
 public class EmptyEvaluator extends Evaluator {
 
-	public static void main(final String[] args) throws ParseException {
-		final Evaluator evaluator = new EmptyEvaluator(args);
-		evaluator.evaluate();
-	}
 
-	public EmptyEvaluator(final String[] args) throws ParseException {
-		super("empty", args);
+	public EmptyEvaluator(final ExecutionConfig executionConfig, final File projectFolder) throws ParseException {
+		super("empty", executionConfig, projectFolder);
 	}
 
 	@Override
@@ -33,7 +30,7 @@ public class EmptyEvaluator extends Evaluator {
 			iterator.goToNextCommit();
 
 			final File currentFile = folders.getResultFile(i, iterator.getTag());
-			executor.executeAllKoPeMeTests(currentFile);
+			executor.executeTests(new File("results/ekstazi-empty.txt"), "*"); // Try to run all tests by running *
 
 			final EvaluationVersion currentVersion = getTestsFromFile(currentFile);
 			if (currentVersion.getTestcaseExecutions().size() > 0) {
