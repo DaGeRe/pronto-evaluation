@@ -46,9 +46,9 @@ public class EkstaziEvaluator extends Evaluator {
 
    public void analyzeVersion(final File resultFile, final int i) throws IOException, InterruptedException, XmlPullParserException {
       final File currentFile = folders.getResultFile(i, iterator.getTag());
-      executor.prepareKoPeMeExecution(new File("results/preparelog.txt"));
+      executor.prepareKoPeMeExecution(new File(currentFile.getParentFile(), currentFile.getName() + "_prepare"));
 //      TestSet tests = executor.getTestTransformer().findModuleTests(mapping, executor.getModules(), executor.getModules());
-      executor.executeTests(new File("results/ekstazi-all.txt"), "*"); // Try to run all tests by running *
+      executor.executeTests(currentFile, "*"); // Try to run all tests by running *
 
       final EvaluationVersion currentVersion = getTestsFromFile(currentFile);
       if (currentVersion.getTestcaseExecutions().size() > 0) {
