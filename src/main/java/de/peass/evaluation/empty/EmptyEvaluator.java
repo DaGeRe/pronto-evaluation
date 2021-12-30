@@ -30,7 +30,7 @@ public class EmptyEvaluator extends Evaluator {
 			iterator.goToNextCommit();
 
 			final File currentFile = folders.getResultFile(i, iterator.getTag());
-			executor.executeTests(new File("results/ekstazi-empty.txt"), "*"); // Try to run all tests by running *
+         executor.executeTests(currentFile, "*"); // Try to run all tests by running *
 
 			final EvaluationVersion currentVersion = getTestsFromFile(currentFile);
 			if (currentVersion.getTestcaseExecutions().size() > 0) {

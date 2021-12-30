@@ -52,8 +52,8 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 	   // Attention: No clean for infinitest possible!
 		final String[] originals = new String[] { "mvn", "-B", "test", "-fn", 
 		      "-Dcheckstyle.skip=true",
-				"-Dmaven.compiler.source=1.7", 
-				"-Dmaven.compiler.target=1.7", 
+				"-Dmaven.compiler.source=1.8", 
+				"-Dmaven.compiler.target=1.8", 
 				"-Dmaven.javadoc.skip=true",
 				"-Denforcer.skip=true",
             "-DfailIfNoTests=false",
@@ -108,12 +108,14 @@ public class SysoutTestExecutor extends MavenTestExecutor {
 
          
       });
-		killerThread.start();
-		killerThread.join(1000);
-		LOG.info("Destroying took too long..");
-		process.destroyForcibly();
-		LOG.info("Destroy-message sent");
-		destoryhard(process);
+		if (process.isAlive()) {
+		   killerThread.start();
+	      killerThread.join(1000);
+	      LOG.info("Destroying took too long..");
+	      process.destroyForcibly();
+	      LOG.info("Destroy-message sent");
+	      destoryhard(process);
+		}
 	}
 	
 	public static void destoryhard(final Process process) {
